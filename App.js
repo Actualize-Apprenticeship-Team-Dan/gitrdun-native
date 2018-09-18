@@ -47,7 +47,7 @@ export default class App extends React.Component {
         </View>
         <View styles={styles.tasksContainer}>
           <FlatList
-            style={{width: 400 }}
+            style={{width: 350 }}
             data={this.state.tasks}
             renderItem={({item}) => <Task key={item.key} task={item} deleteTask={this.deleteTask} />}
           />
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     borderWidth: 1,
-    borderColor: "gray",
+    borderColor: "aqua",
     padding: 10
   },
   banner: {

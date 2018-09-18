@@ -15,10 +15,10 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   tasks: {
-    backgroundColor: 'grey',
+    backgroundColor: 'aqua',
     width: '90%',
     height: 50,
-    margin: 10,
+    margin: 17,
     justifyContent: 'center',
     alignItems:'center'
   }
