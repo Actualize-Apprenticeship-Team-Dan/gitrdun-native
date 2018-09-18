@@ -1,21 +1,34 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
-import TaskList from './TaskList'
+import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
+import Task from './Task'
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      tasks: ["hello", "GoodBye"],
+      tasks: [{text: "hello", key: '1', date: new Date('December 17, 1995').getTime()}, {text: "GoodBye", key: '2', date: new Date('December 25, 2017').getTime()}],
       inputText: ''
     }
   }
 
+  onChangeText = (text) => this.setState({inputText: text})
+
   addTask = () => {
-    let tasks = this.state.tasks
-    tasks.push(this.state.inputText)
+    let tasks = this.state.tasks.slice()
+    let newKey = tasks.length + 1
+    tasks.push({
+      text: this.state.inputText,
+      key: newKey.toString(),
+      date: new Date().getTime()
+    })
     this.setState({tasks: tasks, inputText: ''})
+  }
+
+  deleteTask = (key) => {
+    let tasks = this.state.tasks.filter(task => task.key !== key)
+    console.log('delete')
+    this.setState({tasks: tasks})
   }
 
   render() {
@@ -24,23 +37,21 @@ export default class App extends React.Component {
         <View style={styles.banner}>
           <Text style={styles.bannerText}>GITRDUN</Text>
         </View>
-          <View>
-            {this.state.tasks.map((task, index) =>  
-                (<Text key={index} style={styles.tasks}>{task}</Text>)
-              )}
-              <TextInput style={{height: 40}} 
-              value={this.state.inputText}
-              placeholder='addTask'
-              onChangeText={(text) => {
-                this.setState({inputText: text})
-              }}>
-              
-            </TextInput>
-              <Button onPress={this.addTask} title="add task">
-                
-              </Button>
-          </View>
-          
+        <View style={styles.inputContainer}>
+          <TextInput style={styles.input}
+            value={this.state.inputText}
+            placeholder='addTask'
+            onChangeText={this.onChangeText}
+          />
+          <Button onPress={this.addTask} title="add task" />
+        </View>
+        <View styles={styles.tasksContainer}>
+          <FlatList
+            style={{width: 400 }}
+            data={this.state.tasks}
+            renderItem={({item}) => <Task key={item.key} task={item} deleteTask={this.deleteTask} />}
+          />
+        </View>
       </View>
     );
   }
@@ -48,9 +59,25 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
+    alignItems: "center",
+  },
+  tasksContainer: {
+    margin: 10
+  },
+  inputContainer: {
+    marginTop: 10,
+    height: 100,
+    width: '100%',
+    paddingRight: 10,
+    paddingLeft: 10,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: "gray",
+    padding: 10
   },
   banner: {
     width: '100%',
@@ -61,11 +88,5 @@ const styles = StyleSheet.create({
   bannerText: {
     lineHeight: 100,
     textAlign: 'center'
-  },
-  tasks: {
-    backgroundColor: 'grey',
-    width: 100,
-    height: 100,
-    margin: 10
   }
 });
