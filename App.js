@@ -1,34 +1,76 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
 import Task from './Task'
+import firebase from './firebase';
 
 export default class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      tasks: [{text: "hello", key: '1', date: new Date('December 17, 1995').getTime()}, {text: "GoodBye", key: '2', date: new Date('December 25, 2017').getTime()}],
+      tasks: [],
       inputText: ''
     }
+  }
+
+  componentDidMount() {
+    firebase.firestore().collection('tasks').onSnapshot(snapshot => {
+      let tasks = [];
+      snapshot.forEach(doc => {
+        console.log(doc.data());
+        tasks.push(doc.data());
+      })
+      tasks = tasks.map(task => {
+        task['key'] = task.id.toString()
+        task.date = task.date.toDate().getTime()
+        return task
+      })
+      this.setState({ tasks: tasks });
+    })
+  }
+
+  toggleCompleted = (task) => {
+    task.completed = !task.completed
+    this.updateTask(task)
+  }
+
+  updateTask(task) {
+    task.date = new Date(task.date)
+    firebase.firestore().collection('tasks').doc(task.id).set(task).then(() => {
+      console.log("Document updated successfully");
+    }).catch((error) => {
+      console.error("Error updating document: ", error);
+    });
   }
 
   onChangeText = (text) => this.setState({inputText: text})
 
   addTask = () => {
-    let tasks = this.state.tasks.slice()
-    let newKey = tasks.length + 1
-    tasks.push({
+    let id = new Date().getTime().toString()
+    firebase.firestore().collection('tasks').doc(id).set({
       text: this.state.inputText,
-      key: newKey.toString(),
-      date: new Date().getTime()
+      date: new Date(),
+      completed: false,
+      id: id,
+      user: 'mobile device',
+      dueDate: new Date()
+    }).then(() => {
+      this.setState({
+        inputText: "",
+        dueDate: new Date(),
+        open: false
+      })
+    }).catch((error) => {
+      console.log("error adding document", error)
     })
-    this.setState({tasks: tasks, inputText: ''})
   }
 
-  deleteTask = (key) => {
-    let tasks = this.state.tasks.filter(task => task.key !== key)
-    console.log('delete')
-    this.setState({tasks: tasks})
+  deleteTask = (taskId) => {
+    firebase.firestore().collection('tasks').doc(taskId).delete().then(() => {
+      console.log("Document successfully deleted!");
+    }).catch((error) => {
+      console.error("Error removing document: ", error);
+    });
   }
 
   render() {
@@ -49,7 +91,14 @@ export default class App extends React.Component {
           <FlatList
             style={{width: 350 }}
             data={this.state.tasks}
-            renderItem={({item}) => <Task key={item.key} task={item} deleteTask={this.deleteTask} />}
+            renderItem={({item}) =>
+              <Task
+                key={item.key}
+                task={item}
+                deleteTask={this.deleteTask}
+                toggleCompleted={this.toggleCompleted}
+              />
+            }
           />
         </View>
       </View>
