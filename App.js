@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
 import Task from './Task'
 import firebase from './firebase';
+import { Button } from 'react-native-elements';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -85,7 +86,11 @@ export default class App extends React.Component {
             placeholder='addTask'
             onChangeText={this.onChangeText}
           />
-          <Button onPress={this.addTask} title="add task" />
+          <Button style={styles.addButton} 
+            title="add task"
+            icon={{name: 'plus' , type:'font-awesome'}}
+            onPress={this.addTask}
+          />
         </View>
         <View styles={styles.tasksContainer}>
           <FlatList
@@ -137,5 +142,8 @@ const styles = StyleSheet.create({
   bannerText: {
     lineHeight: 100,
     textAlign: 'center'
+  },
+  addButton: {
+    marginTop: 10
   }
 });

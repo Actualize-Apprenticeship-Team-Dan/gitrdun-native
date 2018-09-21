@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, Text, View} from 'react-native';
+import { Button } from 'react-native-elements';
 
 export default class App extends React.Component {
 
@@ -7,10 +8,16 @@ export default class App extends React.Component {
     return (
       <View style={styles.tasks}>
         <Text>{this.props.task.text} | {this.props.task.date}</Text>
-        <Button title="X" onPress={() => this.props.deleteTask(this.props.task.id)} />
+        <Button 
+          icon={{name: 'times-circle' , type:'font-awesome'}}
+          onPress={() => this.props.deleteTask(this.props.task.id)} 
+          buttonStyle={{backgroundColor: 'rgba(0,0,0,0)'}}
+        />
+
         <Button
-          title={this.props.task.completed ? 'C' : 'U'}
+          icon={this.props.task.completed ? {name: 'check-circle' , type:'font-awesome'} : {name: 'circle' , type:'font-awesome'}}
           onPress={() => this.props.toggleCompleted(this.props.task)}
+          buttonStyle={{backgroundColor: 'rgba(0,0,0,0)'}}
         />
       </View>
     )
